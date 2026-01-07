@@ -1,0 +1,13 @@
+﻿{
+  "mcpServers": {
+    "unreal-mcp": {
+      "command": "uv",
+      "args": [
+        "--directory",
+        "C:\\Unreal_Projects\\Project_TOKI\\Plugins\\unreal-mcp-main\\unreal-mcp-main\\Python",
+        "run",
+        "unreal_mcp_server.py"
+      ]
+    }
+  }
+}
