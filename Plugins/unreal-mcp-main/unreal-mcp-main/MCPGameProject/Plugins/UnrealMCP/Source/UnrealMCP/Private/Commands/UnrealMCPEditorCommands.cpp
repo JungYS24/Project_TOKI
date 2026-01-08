@@ -63,6 +63,10 @@ FUnrealMCPEditorCommands::HandleCommand(const FString &CommandType,
     return HandleTakeScreenshot(Params);
   } else if (CommandType == TEXT("create_landscape")) {
     return HandleCreateLandscape(Params);
+  } else if (CommandType == TEXT("get_current_level_name")) {
+    return HandleGetCurrentLevelName(Params);
+  } else if (CommandType == TEXT("run_python")) {
+    return HandleRunPython(Params);
   }
 
   return FUnrealMCPCommonUtils::CreateErrorResponse(
@@ -646,4 +650,36 @@ TSharedPtr<FJsonObject> FUnrealMCPEditorCommands::HandleCreateLandscape(
   ResultObj->SetBoolField(TEXT("success"), true);
   ResultObj->SetStringField(TEXT("name"), Landscape->GetName());
   return ResultObj;
+}
+
+TSharedPtr<FJsonObject> FUnrealMCPEditorCommands::HandleGetCurrentLevelName(
+    const TSharedPtr<FJsonObject> &Params) {
+  UWorld *World = GEditor->GetEditorWorldContext().World();
+  if (!World) {
+    return FUnrealMCPCommonUtils::CreateErrorResponse(
+        TEXT("Failed to get editor world"));
+  }
+
+  TSharedPtr<FJsonObject> ResultObj = MakeShared<FJsonObject>();
+  ResultObj->SetStringField(TEXT("level_name"), World->GetMapName());
+  ResultObj->SetStringField(TEXT("full_path"),
+                            World->GetOutermost()->GetName());
+  ResultObj->SetBoolField(TEXT("success"), true);
+  return ResultObj;
+}
+
+TSharedPtr<FJsonObject> FUnrealMCPEditorCommands::HandleRunPython(
+    const TSharedPtr<FJsonObject> &Params) {
+  FString ScriptPath;
+  if (Params->TryGetStringField(TEXT("script_path"), ScriptPath)) {
+    FString Cmd = FString::Printf(TEXT("py \"%s\""), *ScriptPath);
+    if (GEditor) {
+      GEditor->Exec(GEditor->GetEditorWorldContext().World(), *Cmd);
+      TSharedPtr<FJsonObject> ResultObj = MakeShared<FJsonObject>();
+      ResultObj->SetBoolField(TEXT("success"), true);
+      return ResultObj;
+    }
+  }
+  return FUnrealMCPCommonUtils::CreateErrorResponse(
+      TEXT("Missing script_path or GEditor is null"));
 }

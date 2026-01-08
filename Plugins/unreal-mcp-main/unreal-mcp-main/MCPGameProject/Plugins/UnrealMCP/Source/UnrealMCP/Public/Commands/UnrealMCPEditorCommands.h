@@ -45,4 +45,12 @@ private:
   // Landscape commands
   TSharedPtr<FJsonObject>
   HandleCreateLandscape(const TSharedPtr<FJsonObject> &Params);
+
+  // Level commands
+  TSharedPtr<FJsonObject>
+  HandleGetCurrentLevelName(const TSharedPtr<FJsonObject> &Params);
+
+  // Scripting commands
+  TSharedPtr<FJsonObject>
+  HandleRunPython(const TSharedPtr<FJsonObject> &Params);
 };
